@@ -1,0 +1,9 @@
+# Shotgun Pipeline Toolkit configuration file
+# this file was automatically created
+
+host: https://juicewro.shotgunstudio.com
+api_script: 
+api_key: 
+http_proxy: null
+
+# End of file.
