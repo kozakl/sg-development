@@ -438,6 +438,13 @@ paths:
         definition: '@asset_root/publish/caches/{Asset}__{name}_v{version}.abc'
         root_name: 'primary'
 
+    #
+    # Preview Animation
+    #
+
+    preview_animation_shot:
+        definition: '@shot_root/publish/preview/{Sequence}_{Shot}__{name}_{task_name}_v{version}.mp4'
+        root_name: 'primary'
 
     #
     # Photoshop
