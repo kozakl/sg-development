@@ -123,12 +123,7 @@ class PublishHook(Hook):
                 self.__publish_preview_animation(
                     item,
                     output,
-                    work_template,
-                    primary_publish_path,
-                    sg_task,
-                    comment,
-                    thumbnail_path,
-                    progress_cb,
+                    work_template
                 )
             else:
                 errors.append("Don't know how to publish this item!")
@@ -211,9 +206,7 @@ class PublishHook(Hook):
         else:
             raise TankError("Alembic export did not write a file to disk!")
 
-    def __publish_preview_animation(
-            self, item, output, work_template, primary_publish_path,
-            sg_task, comment, thumbnail_path, progress_cb):
+    def __publish_preview_animation(self, item, output, work_template):
 
         if os.path.exists(MaxPlus.PathManager.GetPreviewDir() + '/temp/'):
             shutil.rmtree(MaxPlus.PathManager.GetPreviewDir() + '/temp/')
@@ -241,14 +234,10 @@ class PublishHook(Hook):
 
         if not os.path.exists(publish_path):
             raise TankError('Preview Animation export did not write a video to disk!')
-        
-        version = self.parent.tank.shotgun.create('Version', {'entity': {'type': 'Shot', 'id': self.parent.context.entity["id"]},
+
+        version = self.parent.tank.shotgun.create('Version', {'entity':  {'type': 'Shot',    'id': self.parent.context.entity["id"]},
                                                               'project': {'type': 'Project', 'id': self.parent.context.project["id"]},
-                                                              'sg_task': {'type': 'Task', 'id': self.parent.context.task['id']},
+                                                              'sg_task': {'type': 'Task',    'id': self.parent.context.task['id']},
                                                               'code': os.path.basename(publish_path), 'sg_version_type': 'Offline'})
 
-        #version = self.parent.tank.shotgun.create('Version', {'entity': {'type': 'Shot', 'id': self.parent.context.entity["id"]},
-        #                                          'project': {'type': 'Project', 'id': self.parent.context.project["id"]},
-        #                                          'code': os.path.basename(publish_path), 'sg_version_type': 'Offline'})
-        print version
         self.parent.tank.shotgun.upload('Version', version['id'], publish_path, 'sg_uploaded_movie')
