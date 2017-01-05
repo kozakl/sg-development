@@ -239,51 +239,13 @@ class PublishHook(Hook):
                   config_path + 'tools/ffmpeg.exe -f image2 -r 30 -i "frame%04d.png" -vcodec mpeg4 -y ' + publish_path)
         shutil.rmtree(MaxPlus.PathManager.GetPreviewDir() + '/temp/')
 
-        # determine the publish name:
-        publish_name = fields.get("name")
-        publish_version = fields["version"]
-        tank_type = output["tank_type"]
+        if not os.path.exists(publish_path):
+            raise TankError('Preview Animation export did not write a video to disk!')
         
-        print "tk: ", self.parent.tank
-        print "context: ", self.parent.context
-        print "comment: ", comment
-        print "path: ", publish_path
-        print "name: ", publish_name
-        print "version_number: ", publish_version
-        print "thumbnail_path: ", thumbnail_path
-        print "task: ", sg_task
-        print "dependency_paths: ", primary_publish_path
-        print "published_file_type: ", tank_type
-
-        # register the publish:
-        if os.path.exists(publish_path):
-            progress_cb(75, "Registering the publish")
-            args = {
-                "tk": self.parent.tank,
-                "context": self.parent.context,
-                "comment": comment,
-                "path": publish_path,
-                "name": publish_name,
-                "version_number": publish_version,
-                "thumbnail_path": thumbnail_path,
-                "task": sg_task,
-                "dependency_paths": [primary_publish_path],
-                "published_file_type": tank_type
-            }
-           # entity = tank.util.register_publish(**args)
-        else:
-            raise TankError("Preview Animation export did not write a file to disk!")
-
-        print '--------------------------------------------'
-        #print entity
-        print self.parent.context.entity["type"]
-        print self.parent.context.entity["id"]
-        print self.parent.context.project["id"]
-        print self.parent.tank.pipeline_configuration.get_published_file_entity_type()
-
-        version = self.parent.tank.shotgun.create('Version', {'entity': {'type': 'Task', 'id': 7461},
-                                                   'project': {'type': 'Project', 'id': self.parent.context.project["id"]},
-                                                   'code': os.path.basename(publish_path), 'sg_version_type': 'Offline'})
+        version = self.parent.tank.shotgun.create('Version', {'entity': {'type': 'Shot', 'id': self.parent.context.entity["id"]},
+                                                              'project': {'type': 'Project', 'id': self.parent.context.project["id"]},
+                                                              'sg_task': {'type': 'Task', 'id': self.parent.context.task['id']},
+                                                              'code': os.path.basename(publish_path), 'sg_version_type': 'Offline'})
 
         #version = self.parent.tank.shotgun.create('Version', {'entity': {'type': 'Shot', 'id': self.parent.context.entity["id"]},
         #                                          'project': {'type': 'Project', 'id': self.parent.context.project["id"]},
