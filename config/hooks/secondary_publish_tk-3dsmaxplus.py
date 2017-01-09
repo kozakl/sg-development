@@ -208,29 +208,21 @@ class PublishHook(Hook):
 
     def __publish_preview_animation(self, item, output, work_template):
 
-        if os.path.exists(MaxPlus.PathManager.GetPreviewDir() + '/temp/'):
-            shutil.rmtree(MaxPlus.PathManager.GetPreviewDir() + '/temp/')
-        os.makedirs(MaxPlus.PathManager.GetPreviewDir() + '/temp/')
+        MaxPlus.RenderExecute.CreatePreview()
+        if os.path.getsize(MaxPlus.PathManager.GetPreviewDir() + '/_scene.avi') == 0:
+            raise TankError('Skonfiguruj Make Preview(Shift + V) przed pierwszym uzyciem!')
 
         config_path = os.path.dirname(os.path.abspath(__file__))[0:-12]
-        create_sequence = open(config_path + 'config/hooks/3dsmax/create_sequence.ms', 'r')
-        MaxPlus.Core.ExecuteMAXScript(
-            "global T=10\n" +
-            create_sequence.read())
-
         scene_path = os.path.abspath(MaxPlus.FileManager.GetFileNameAndPath())
         fields = work_template.get_fields(scene_path)
 
-        publish_template = output["publish_template"]
+        publish_template = output['publish_template']
         publish_path = publish_template.apply_fields(fields)
 
-        # ensure the publish folder exists:
-        publish_folder = os.path.dirname(publish_path)
-        self.parent.ensure_folder_exists(publish_folder)
+        self.parent.ensure_folder_exists(os.path.dirname(publish_path))
 
-        os.system('cd ' + MaxPlus.PathManager.GetPreviewDir() + '/temp/ & ' +
-                  config_path + 'tools/ffmpeg.exe -f image2 -r 30 -i "frame%04d.png" -vcodec mpeg4 -y ' + publish_path)
-        shutil.rmtree(MaxPlus.PathManager.GetPreviewDir() + '/temp/')
+        os.system(config_path + 'tools/ffmpeg.exe' + '-i ' + MaxPlus.PathManager.GetPreviewDir() + '/_scene.avi ' +
+                                                     '-c:v libx264 -crf 19 -preset ' + publish_path)
 
         if not os.path.exists(publish_path):
             raise TankError('Preview Animation export did not write a video to disk!')
