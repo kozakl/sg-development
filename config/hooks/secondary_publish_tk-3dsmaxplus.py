@@ -219,23 +219,21 @@ class PublishHook(Hook):
         scene_path = os.path.abspath(MaxPlus.FileManager.GetFileNameAndPath())
         fields = work_template.get_fields(scene_path)
 
-        publish_template = output['publish_template']
-        publish_path = publish_template.apply_fields(fields)
-
+        publish_path = output['publish_template'].apply_fields(fields)
         self.parent.ensure_folder_exists(os.path.dirname(publish_path))
-        progress_cb(45, 'Convert video(.avi -> .mp4)')
 
+        progress_cb(45, 'Convert video(.avi -> .mp4)')
         os.system(config_path + 'tools/ffmpeg.exe ' + '-i ' + MaxPlus.PathManager.GetPreviewDir() + '/_scene.avi ' +
                                                       '-c:v libx264 -crf 19 -preset slow ' + publish_path)
-
         if not os.path.exists(publish_path):
             raise TankError('Preview Animation export did not write a video to disk!')
 
         progress_cb(75, 'Upload Version to server.')
 
-        version = self.parent.tank.shotgun.create('Version', {'entity':  {'type': 'Shot',    'id': self.parent.context.entity["id"]},
-                                                              'project': {'type': 'Project', 'id': self.parent.context.project["id"]},
-                                                              'sg_task': {'type': 'Task',    'id': self.parent.context.task['id']},
+        context = self.parent.context
+        version = self.parent.tank.shotgun.create('Version', {'entity':  {'type': 'Shot',    'id': context.entity["id"]},
+                                                              'project': {'type': 'Project', 'id': context.project["id"]},
+                                                              'sg_task': {'type': 'Task',    'id': context.task['id']},
                                                               'code': os.path.basename(publish_path), 'sg_version_type': 'Offline'})
 
         self.parent.tank.shotgun.upload('Version', version['id'], publish_path, 'sg_uploaded_movie')
