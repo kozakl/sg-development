@@ -225,8 +225,8 @@ class PublishHook(Hook):
         self.parent.ensure_folder_exists(os.path.dirname(publish_path))
         progress_cb(45, 'Convert video(.avi -> .mp4)')
 
-        os.system(config_path + 'tools/ffmpeg.exe' + '-i ' + MaxPlus.PathManager.GetPreviewDir() + '/_scene.avi ' +
-                                                     '-c:v libx264 -crf 19 -preset ' + publish_path)
+        os.system(config_path + 'tools/ffmpeg.exe ' + '-i ' + MaxPlus.PathManager.GetPreviewDir() + '/_scene.avi ' +
+                                                      '-c:v libx264 -crf 19 -preset slow ' + publish_path)
 
         if not os.path.exists(publish_path):
             raise TankError('Preview Animation export did not write a video to disk!')
