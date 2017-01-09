@@ -123,7 +123,8 @@ class PublishHook(Hook):
                 self.__publish_preview_animation(
                     item,
                     output,
-                    work_template
+                    work_template,
+                    progress_cb
                 )
             else:
                 errors.append("Don't know how to publish this item!")
@@ -206,7 +207,9 @@ class PublishHook(Hook):
         else:
             raise TankError("Alembic export did not write a file to disk!")
 
-    def __publish_preview_animation(self, item, output, work_template):
+    def __publish_preview_animation(self, item, output, work_template, progress_cb):
+
+        progress_cb(10, 'Create preview')
 
         MaxPlus.RenderExecute.CreatePreview()
         if os.path.getsize(MaxPlus.PathManager.GetPreviewDir() + '/_scene.avi') == 0:
@@ -220,12 +223,15 @@ class PublishHook(Hook):
         publish_path = publish_template.apply_fields(fields)
 
         self.parent.ensure_folder_exists(os.path.dirname(publish_path))
+        progress_cb(45, 'Convert video(.avi -> .mp4)')
 
         os.system(config_path + 'tools/ffmpeg.exe' + '-i ' + MaxPlus.PathManager.GetPreviewDir() + '/_scene.avi ' +
                                                      '-c:v libx264 -crf 19 -preset ' + publish_path)
 
         if not os.path.exists(publish_path):
             raise TankError('Preview Animation export did not write a video to disk!')
+
+        progress_cb(75, 'Upload Version to server.')
 
         version = self.parent.tank.shotgun.create('Version', {'entity':  {'type': 'Shot',    'id': self.parent.context.entity["id"]},
                                                               'project': {'type': 'Project', 'id': self.parent.context.project["id"]},
