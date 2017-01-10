@@ -234,6 +234,7 @@ class PublishHook(Hook):
         version = self.parent.tank.shotgun.create('Version', {'entity':  {'type': 'Shot',    'id': context.entity["id"]},
                                                               'project': {'type': 'Project', 'id': context.project["id"]},
                                                               'sg_task': {'type': 'Task',    'id': context.task['id']},
-                                                              'code': os.path.basename(publish_path), 'sg_version_type': 'Offline'})
+                                                              'sg_path_to_movie': publish_path,
+                                                              'code':             os.path.basename(publish_path), 'sg_version_type': 'Offline'})
 
         self.parent.tank.shotgun.upload('Version', version['id'], publish_path, 'sg_uploaded_movie')
