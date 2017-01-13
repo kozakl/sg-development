@@ -72,8 +72,8 @@ engines:
         hook_primary_pre_publish: default
         hook_primary_publish: default
         hook_scan_scene: default
-        hook_secondary_pre_publish: default
-        hook_secondary_publish: default
+        hook_secondary_pre_publish: '{config}/secondary_pre_publish_tk-3dsmaxplus.py'
+        hook_secondary_publish: '{config}/secondary_publish_tk-3dsmaxplus.py'
         hook_thumbnail: default
         location:
           version: v0.9.6
@@ -96,6 +96,16 @@ engines:
           scene_item_type: geometry
           selected: false
           tank_type: Alembic Cache
+        - description: Create Preview Animation
+          display_group: Additionals
+          display_name: Preview Animation
+          icon: ' '
+          name: preview_animation
+          publish_template: preview_animation_asset
+          required: false
+          scene_item_type: geometry
+          selected: false
+          tank_type: Preview Animation
         template_work: max_asset_work
       tk-multi-screeningroom: '@launch_screeningroom'
       tk-multi-snapshot:
