@@ -9,7 +9,7 @@
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
 import os
-import shutil
+import subprocess
 
 import tank
 from tank import Hook
@@ -223,18 +223,22 @@ class PublishHook(Hook):
         self.parent.ensure_folder_exists(os.path.dirname(publish_path))
 
         progress_cb(45, 'Convert video(.avi -> .mp4)')
-        os.system(config_path + 'tools/ffmpeg.exe ' + '-i ' + MaxPlus.PathManager.GetPreviewDir() + '/_scene.avi ' +
-                                                      '-c:v libx264 -crf 19 -preset slow ' + publish_path)
+        subprocess.Popen([config_path + 'tools/ffmpeg.exe', '-i', MaxPlus.PathManager.GetPreviewDir() + '/_scene.avi',
+                                                            '-c:v', 'libx264',
+                                                            '-crf', '19',
+                                                            '-preset', 'slow', publish_path],
+                         shell=True, creationflags=subprocess.SW_HIDE).wait()
         if not os.path.exists(publish_path):
             raise TankError('Preview Animation export did not write a video to disk!')
 
         progress_cb(75, 'Upload Version to server.')
 
         context = self.parent.context
-        version = self.parent.tank.shotgun.create('Version', {'entity':  {'type': 'Shot',    'id': context.entity["id"]},
-                                                              'project': {'type': 'Project', 'id': context.project["id"]},
-                                                              'sg_task': {'type': 'Task',    'id': context.task['id']},
+        version = self.parent.tank.shotgun.create('Version', {'project':          context.project,
+                                                              'sg_task':          context.task,
+                                                              'entity':           context.entity,
                                                               'sg_path_to_movie': publish_path,
-                                                              'code':             os.path.basename(publish_path), 'sg_version_type': 'Offline'})
+                                                              'sg_version_type': 'Offline',
+                                                              'code':             os.path.basename(publish_path)})
 
         self.parent.tank.shotgun.upload('Version', version['id'], publish_path, 'sg_uploaded_movie')
