@@ -443,11 +443,11 @@ paths:
     #
     
     preview_animation_shot:
-        definition: '@shot_root/prev/{Sequence}_{Shot}__{name}_{step_code}_v{version}.mp4'
+        definition: '@shot_root/prev/{Sequence}_{Shot}__{name}_{step_code}_v{version}.avi'
         root_name: 'primary'
     
     preview_animation_asset:
-        definition: '@asset_root/prev/{Asset}_{name}_{step_code}_v{version}.mp4'
+        definition: '@asset_root/prev/{Asset}_{name}_{step_code}_v{version}.avi'
         root_name: 'primary'
 
     #
