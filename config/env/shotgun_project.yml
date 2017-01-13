@@ -48,6 +48,11 @@ engines:
           name: tk-shotgun-launchfolder
           type: app_store
           version: v0.1.5
+      tk-shotgun-folders:
+        location:
+          version: v0.1.5
+          type: app_store
+          name: tk-shotgun-folders
     debug_logging: false
     location:
       version: v0.5.2
