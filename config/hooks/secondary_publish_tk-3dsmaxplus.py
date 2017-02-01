@@ -10,7 +10,6 @@
 
 import os
 import subprocess
-import shutil
 
 import tank
 from tank import Hook
@@ -216,14 +215,27 @@ class PublishHook(Hook):
         if os.path.getsize(MaxPlus.PathManager.GetPreviewDir() + '/_scene.avi') == 0:
             raise TankError('Skonfiguruj Make Preview(Shift + V) przed pierwszym uzyciem!')
 
+        config_path = os.path.dirname(os.path.abspath(__file__))[0:-12]
         scene_path = os.path.abspath(MaxPlus.FileManager.GetFileNameAndPath())
         fields = work_template.get_fields(scene_path)
 
         publish_path = output['publish_template'].apply_fields(fields)
         self.parent.ensure_folder_exists(os.path.dirname(publish_path))
 
-        progress_cb(45, 'Copy video')
-        shutil.copy(MaxPlus.PathManager.GetPreviewDir() + '/_scene.avi', publish_path)
+        progress_cb(45, 'Convert video(.avi -> .mp4)')
+        subprocess.Popen([config_path + 'tools/ffmpeg.exe', '-i', MaxPlus.PathManager.GetPreviewDir() + '/_scene.avi',
+                                                            '-c:v',       'libx264',
+                                                            '-profile:v', 'main',
+                                                            '-level',     '3.1',
+                                                            '-preset',    'veryslow',
+                                                            '-pix_fmt',   'yuv420p',
+                                                            '-crf',       '20',
+                                                            '-maxrate',   '400k',
+                                                            '-bufsize',   '1835k',
+                                                            '-vf',        'scale=trunc(iw/2)*2:trunc(ih/2)*2',
+                                                            publish_path],
+                         shell=True, creationflags=subprocess.SW_HIDE).wait()
+
         if not os.path.exists(publish_path):
             raise TankError('Preview Animation export did not write a video to disk!')
 
