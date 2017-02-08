@@ -229,9 +229,9 @@ class PublishHook(Hook):
                                                             '-level',     '3.1',
                                                             '-preset',    'veryslow',
                                                             '-pix_fmt',   'yuv420p',
-                                                            '-crf',       '20',
-                                                            '-maxrate',   '400k',
-                                                            '-bufsize',   '1835k',
+                                                            '-crf',       '1',
+                                                            '-maxrate',   '600k',
+                                                            '-bufsize',   '100000k',
                                                             '-vf',        'scale=trunc(iw/2)*2:trunc(ih/2)*2',
                                                             publish_path],
                          shell=True, creationflags=subprocess.SW_HIDE).wait()
