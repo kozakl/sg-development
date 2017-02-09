@@ -211,10 +211,6 @@ class PublishHook(Hook):
 
         progress_cb(10, 'Create preview')
 
-        MaxPlus.RenderExecute.CreatePreview()
-        if os.path.getsize(MaxPlus.PathManager.GetPreviewDir() + '/_scene.avi') == 0:
-            raise TankError('Skonfiguruj Make Preview(Shift + V) przed pierwszym uzyciem!')
-
         config_path = os.path.dirname(os.path.abspath(__file__))[0:-12]
         scene_path = os.path.abspath(MaxPlus.FileManager.GetFileNameAndPath())
         fields = work_template.get_fields(scene_path)

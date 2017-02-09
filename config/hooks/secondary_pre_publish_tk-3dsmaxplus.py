@@ -14,6 +14,7 @@ import sgtk
 from sgtk import Hook
 from sgtk import TankError
 
+import MaxPlus
 
 class PrePublishHook(Hook):
     """
@@ -86,12 +87,14 @@ class PrePublishHook(Hook):
 
             # report progress:
             progress_cb(0, "Validating", task)
-
+            print output["name"]
             if output["name"] == "alembic_cache":
                 if app.engine._max_version_to_year(app.engine._get_max_version()) < 2016:
                     errors.append("Alembic export requires 3ds Max 2016 or newer.")
             elif output['name'] == 'preview_animation':
-                pass
+                MaxPlus.RenderExecute.CreatePreview()
+                if os.path.getsize(MaxPlus.PathManager.GetPreviewDir() + '/_scene.avi') == 0:
+                    raise TankError('Skonfiguruj Make Preview(Shift + V) przed pierwszym uzyciem!')
             else:
                 errors.append("Don't know how to publish this item!")
 
