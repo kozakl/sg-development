@@ -94,7 +94,8 @@ class PrePublishHook(Hook):
             elif output['name'] == 'preview_animation':
                 MaxPlus.RenderExecute.CreatePreview()
                 if os.path.getsize(MaxPlus.PathManager.GetPreviewDir() + '/_scene.avi') == 0:
-                    raise TankError('Skonfiguruj Make Preview(Shift + V) przed pierwszym uzyciem!')
+                    MaxPlus.Core.EvalMAXScript('messageBox "Skonfiguruj Make Preview\nprzed pierwszym uzyciem!"')
+                    MaxPlus.Core.EvalMAXScript('actionMan.executeAction 0 "40033"')
             else:
                 errors.append("Don't know how to publish this item!")
 
