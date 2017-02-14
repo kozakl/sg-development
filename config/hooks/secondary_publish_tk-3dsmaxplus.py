@@ -221,7 +221,8 @@ class PublishHook(Hook):
 
         progress_cb(45, 'Convert video(.avi -> sequence .png)')
         subprocess.Popen([config_path + 'tools/ffmpeg.exe', '-i', MaxPlus.PathManager.GetPreviewDir() + '/_scene.avi',
-                                                            publish_path[:-4] + '/frame%04d.png'],
+                                                            publish_path[:-4] + '/' +
+                                                            publish_path.split(os.sep)[-1][:-4] + '_%04d.png'],
                          shell=True, creationflags=subprocess.SW_HIDE).wait()
         progress_cb(45, 'Convert video(.avi -> .mp4)')
         subprocess.Popen([config_path + 'tools/ffmpeg.exe', '-i', MaxPlus.PathManager.GetPreviewDir() + '/_scene.avi',
