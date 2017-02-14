@@ -216,8 +216,13 @@ class PublishHook(Hook):
         fields = work_template.get_fields(scene_path)
 
         publish_path = output['publish_template'].apply_fields(fields)
+        self.parent.ensure_folder_exists(os.path.dirname(publish_path[:-4] + '/'))
         self.parent.ensure_folder_exists(os.path.dirname(publish_path))
 
+        progress_cb(45, 'Convert video(.avi -> sequence .png)')
+        subprocess.Popen([config_path + 'tools/ffmpeg.exe', '-i', MaxPlus.PathManager.GetPreviewDir() + '/_scene.avi',
+                                                            publish_path[:-4] + '/frame%04d.png'],
+                         shell=True, creationflags=subprocess.SW_HIDE).wait()
         progress_cb(45, 'Convert video(.avi -> .mp4)')
         subprocess.Popen([config_path + 'tools/ffmpeg.exe', '-i', MaxPlus.PathManager.GetPreviewDir() + '/_scene.avi',
                                                             '-c:v',       'libx264',
