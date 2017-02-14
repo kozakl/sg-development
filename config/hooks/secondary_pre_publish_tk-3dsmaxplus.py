@@ -87,7 +87,6 @@ class PrePublishHook(Hook):
 
             # report progress:
             progress_cb(0, "Validating", task)
-            print output["name"]
             if output["name"] == "alembic_cache":
                 if app.engine._max_version_to_year(app.engine._get_max_version()) < 2016:
                     errors.append("Alembic export requires 3ds Max 2016 or newer.")
