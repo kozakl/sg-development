@@ -225,17 +225,13 @@ class PublishHook(Hook):
                                                             publish_path.split(os.sep)[-1][:-4] + '_%04d.png'],
                          shell=True, creationflags=subprocess.SW_HIDE).wait()
         progress_cb(45, 'Convert video(.avi -> .mp4)')
-        subprocess.Popen([config_path + 'tools/ffmpeg.exe', '-i', MaxPlus.PathManager.GetPreviewDir() + '/_scene.avi',
-                                                            '-c:v',       'libx264',
-                                                            '-profile:v', 'main',
-                                                            '-level',     '3.1',
-                                                            '-preset',    'veryslow',
-                                                            '-pix_fmt',   'yuv420p',
-                                                            '-crf',       '1',
-                                                            '-maxrate',   '600k',
-                                                            '-bufsize',   '100000k',
-                                                            '-vf',        'scale=trunc(iw/2)*2:trunc(ih/2)*2',
-                                                            publish_path],
+        subprocess.Popen([config_path + 'tools/libav/avconv.exe', '-i', MaxPlus.PathManager.GetPreviewDir() + '/_scene.avi',
+                                                                  '-r', str(self.get_fps(config_path, MaxPlus.PathManager.GetPreviewDir() + '/_scene.avi')),
+                                                                  '-preset', 'veryslow',
+                                                                  '-c:a',    'copy',
+                                                                  '-b',      '3000000',
+                                                                  '-vf',     'scale=trunc(iw/2)*2:trunc(ih/2)*2',
+                          publish_path],
                          shell=True, creationflags=subprocess.SW_HIDE).wait()
 
         if not os.path.exists(publish_path):
@@ -252,3 +248,15 @@ class PublishHook(Hook):
                                                               'code':             os.path.basename(publish_path)})
 
         self.parent.tank.shotgun.upload('Version', version['id'], publish_path, 'sg_uploaded_movie')
+
+    def get_fps(self, config_path, movie):
+        out = os.popen(config_path + 'tools/ffprobe.exe ' + movie + ' -v 0' +
+                                                                    ' -select_streams v' +
+                                                                    ' -print_format flat' +
+                                                                    ' -show_entries stream=r_frame_rate').read()
+        rate = out.split('=')[1].strip()[1:-1].split('/')
+        if len(rate) == 1:
+            return float(rate[0])
+        if len(rate) == 2:
+            return float(rate[0])/float(rate[1])
+        return -1
