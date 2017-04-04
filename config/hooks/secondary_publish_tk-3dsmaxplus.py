@@ -229,7 +229,7 @@ class PublishHook(Hook):
                                                                   '-r', str(self.get_fps(config_path, MaxPlus.PathManager.GetPreviewDir() + '/_scene.avi')),
                                                                   '-preset', 'veryslow',
                                                                   '-c:a',    'copy',
-                                                                  '-b',      '3000000',
+                                                                  '-b',      '30000000',
                                                                   '-vf',     'scale=trunc(iw/2)*2:trunc(ih/2)*2',
                           publish_path],
                          shell=True, creationflags=subprocess.SW_HIDE).wait()
