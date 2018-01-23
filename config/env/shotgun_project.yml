@@ -50,12 +50,12 @@ engines:
           version: v0.1.5
       tk-shotgun-folders:
         location:
-          version: v0.1.5
+          version: v0.1.6
           type: app_store
           name: tk-shotgun-folders
     debug_logging: false
     location:
-      version: v0.5.2
+      version: v0.7.0
       type: app_store
       name: tk-shotgun
 #
